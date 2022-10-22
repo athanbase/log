@@ -89,13 +89,20 @@ func (l *Logger) Fatalf(msg string, args ...any) {
 var (
 	std = New(os.Stderr, InfoLevel, WithCaller(true), AddCallerSkip(1))
 
-	Info   = std.Info
-	Warn   = std.Warn
-	Error  = std.Error
-	DPanic = std.DPanic
-	Panic  = std.Panic
-	Fatal  = std.Fatal
-	Debug  = std.Debug
+	Info    = std.Info
+	Infof   = std.Infof
+	Warn    = std.Warn
+	Warnf   = std.Warnf
+	Error   = std.Error
+	Errorf  = std.Errorf
+	DPanic  = std.DPanic
+	DPanicf = std.DPanicf
+	Panic   = std.Panic
+	Panicf  = std.Panicf
+	Fatal   = std.Fatal
+	Fatalf  = std.Fatalf
+	Debug   = std.Debug
+	Debugf  = std.Debugf
 )
 
 // not safe for concurrent use, replace default std
