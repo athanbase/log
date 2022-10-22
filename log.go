@@ -34,25 +34,56 @@ func (l *Logger) Debug(msg string, fields ...Field) {
 	l.l.Debug(msg, fields...)
 }
 
+func (l *Logger) Debugf(msg string, args ...any) {
+	l.l.Sugar().Debugf(msg, args)
+}
+
 func (l *Logger) Info(msg string, fields ...Field) {
 	l.l.Info(msg, fields...)
+}
+
+func (l *Logger) Infof(msg string, args ...any) {
+	l.l.Sugar().Infof(msg, args...)
 }
 
 func (l *Logger) Warn(msg string, fields ...Field) {
 	l.l.Warn(msg, fields...)
 }
 
+func (l *Logger) Warnf(msg string, args ...any) {
+	l.l.Sugar().Warnf(msg, args...)
+}
+
 func (l *Logger) Error(msg string, fields ...Field) {
 	l.l.Error(msg, fields...)
 }
+
+func (l *Logger) Errorf(msg string, args ...any) {
+	l.l.Sugar().Errorf(msg, args...)
+}
+
 func (l *Logger) DPanic(msg string, fields ...Field) {
 	l.l.DPanic(msg, fields...)
 }
+
+func (l *Logger) DPanicf(msg string, args ...any) {
+	l.l.Sugar().DPanicf(msg, args...)
+}
+
 func (l *Logger) Panic(msg string, fields ...Field) {
 	l.l.Panic(msg, fields...)
 }
+
+func (l *Logger) Panicf(msg string, args ...any) {
+	l.l.Sugar().Panicf(msg, args...)
+}
+
 func (l *Logger) Fatal(msg string, fields ...Field) {
 	l.l.Fatal(msg, fields...)
+}
+
+func (l *Logger) Fatalf(msg string, args ...any) {
+	l.l.Sugar().Fatalf(msg, args...)
 }
 
 var (
