@@ -3,6 +3,7 @@ package log
 import (
 	"io"
 	"os"
+	"time"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -55,7 +56,7 @@ func (l *Logger) Fatal(msg string, fields ...Field) {
 }
 
 var (
-	std = New(os.Stderr, InfoLevel)
+	std = New(os.Stderr, InfoLevel, WithCaller(true))
 
 	Info   = std.Info
 	Warn   = std.Warn
@@ -80,13 +81,25 @@ func ResetDefault(l *Logger) {
 
 func Default() *Logger { return std }
 
+type Option = zap.Option
+
+var (
+	WithCaller    = zap.WithCaller
+	AddStacktrace = zap.AddStacktrace
+)
+
 // New create a new logger
-func New(w io.Writer, level Level) *Logger {
+func New(w io.Writer, level Level, opts ...Option) *Logger {
 	if w == nil {
 		panic("the writer is nil")
 	}
 
 	cfg := zap.NewProductionConfig()
+	// set time format
+	cfg.EncoderConfig.EncodeTime = func(t time.Time, pae zapcore.PrimitiveArrayEncoder) {
+		pae.AppendString(t.Format(time.RFC3339Nano))
+	}
+
 	core := zapcore.NewCore(
 		zapcore.NewJSONEncoder(cfg.EncoderConfig),
 		zapcore.AddSync(w),
@@ -94,7 +107,7 @@ func New(w io.Writer, level Level) *Logger {
 	)
 
 	return &Logger{
-		l:     zap.New(core),
+		l:     zap.New(core, opts...),
 		level: level,
 	}
 }
