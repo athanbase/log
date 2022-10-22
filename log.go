@@ -27,7 +27,7 @@ type Field = zap.Field
 
 type Logger struct {
 	l     *zap.Logger // zap ensure that zap.Logger is safe for concurrent use
-	level Level
+	level zap.AtomicLevel
 }
 
 func (l *Logger) Debug(msg string, fields ...Field) {
@@ -56,7 +56,7 @@ func (l *Logger) Fatal(msg string, fields ...Field) {
 }
 
 var (
-	std = New(os.Stderr, InfoLevel, WithCaller(true))
+	std = New(os.Stderr, InfoLevel, WithCaller(true), AddCallerSkip(1))
 
 	Info   = std.Info
 	Warn   = std.Warn
@@ -85,6 +85,7 @@ type Option = zap.Option
 
 var (
 	WithCaller    = zap.WithCaller
+	AddCallerSkip = zap.AddCallerSkip
 	AddStacktrace = zap.AddStacktrace
 )
 
@@ -108,8 +109,14 @@ func New(w io.Writer, level Level, opts ...Option) *Logger {
 
 	return &Logger{
 		l:     zap.New(core, opts...),
-		level: level,
+		level: zap.NewAtomicLevelAt(level),
 	}
+}
+
+// SetLevel alters the logging level on runtime
+// it is concurrent-safe
+func (l *Logger) SetLevel(level Level) {
+	l.level.SetLevel(zapcore.Level(level))
 }
 
 func (l *Logger) Sync() error {

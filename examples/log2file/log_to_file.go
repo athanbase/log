@@ -14,7 +14,7 @@ func main() {
 		panic(err)
 	}
 
-	logger := log.New(f, log.InfoLevel)
+	logger := log.New(f, log.InfoLevel, log.AddCallerSkip(1), log.WithCaller(true))
 	log.ResetDefault(logger)
 	defer log.Sync()
 
