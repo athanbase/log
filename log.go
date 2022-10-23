@@ -86,6 +86,11 @@ func (l *Logger) Fatalf(msg string, args ...any) {
 	l.l.Sugar().Fatalf(msg, args...)
 }
 
+func (l *Logger) With(fields ...Field) *Logger {
+	logger := l.l.With(fields...)
+	return &Logger{l: logger, level: l.level}
+}
+
 var (
 	std = New(os.Stderr, InfoLevel, WithCaller(true), AddCallerSkip(1))
 
@@ -103,18 +108,27 @@ var (
 	Fatalf  = std.Fatalf
 	Debug   = std.Debug
 	Debugf  = std.Debugf
+	With    = std.With
 )
 
 // not safe for concurrent use, replace default std
 func ResetDefault(l *Logger) {
 	std = l
 	Info = std.Info
+	Infof = std.Infof
 	Warn = std.Warn
+	Warnf = std.Warnf
 	Error = std.Error
+	Errorf = std.Errorf
 	DPanic = std.DPanic
+	DPanicf = std.DPanicf
 	Panic = std.Panic
+	Panicf = std.Panicf
 	Fatal = std.Fatal
+	Fatalf = std.Fatalf
 	Debug = std.Debug
+	Debugf = std.Debugf
+	With = std.With
 }
 
 func Default() *Logger { return std }
@@ -139,15 +153,16 @@ func New(w io.Writer, level Level, opts ...Option) *Logger {
 		pae.AppendString(t.Format(time.RFC3339Nano))
 	}
 
+	atomicLevel := zap.NewAtomicLevelAt(level)
 	core := zapcore.NewCore(
 		zapcore.NewJSONEncoder(cfg.EncoderConfig),
 		zapcore.AddSync(w),
-		zapcore.Level(level),
+		atomicLevel,
 	)
 
 	return &Logger{
 		l:     zap.New(core, opts...),
-		level: zap.NewAtomicLevelAt(level),
+		level: atomicLevel,
 	}
 }
 
